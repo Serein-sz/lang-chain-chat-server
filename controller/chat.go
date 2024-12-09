@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/tmc/langchaingo/llms"
+	"io"
 	"lang-chain-chat-server/model"
 	"lang-chain-chat-server/util"
 	"net/http"
@@ -11,6 +13,7 @@ import (
 type Chat struct{}
 
 func (ch *Chat) DoChat(c *gin.Context) {
+
 	var body model.Chat
 
 	if err := c.ShouldBindJSON(&body); err != nil {
@@ -32,14 +35,24 @@ func (ch *Chat) DoChat(c *gin.Context) {
 
 	llm := util.CreateOllama(c, "qwen2.5-coder:0.5b")
 
-	resp, err := llm.GenerateContent(c, content)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	message := make(chan string, 20)
 
-	c.JSON(http.StatusOK, gin.H{
-		"code": 200,
-		"data": resp.Choices[0].Content,
+	go func() {
+		_, err := llm.GenerateContent(c, content, llms.WithStreamingFunc(func(ctx context.Context, chunk []byte) error {
+			message <- string(chunk)
+			return nil
+		}))
+		defer close(message)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+	}()
+
+	c.Stream(func(w io.Writer) bool {
+		item, ok := <-message
+		c.SSEvent("chat", item)
+		return ok
 	})
+
 }
