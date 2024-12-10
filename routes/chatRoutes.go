@@ -1,14 +1,15 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
 	"lang-chain-chat-server/controller"
+
+	"github.com/gin-gonic/gin"
 )
 
 func ChatRoutes(r *gin.Engine) {
 	chatRouters := r.Group("/chat")
+	chat := controller.Chat{}
 	{
-		chat := controller.Chat{}
 		chatRouters.POST("/", chat.DoChat)
 	}
 }

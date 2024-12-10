@@ -2,12 +2,13 @@ package controller
 
 import (
 	"context"
-	"github.com/gin-gonic/gin"
-	"github.com/tmc/langchaingo/llms"
 	"io"
 	"lang-chain-chat-server/model"
 	"lang-chain-chat-server/util"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/tmc/langchaingo/llms"
 )
 
 type Chat struct{}
@@ -23,7 +24,8 @@ func (ch *Chat) DoChat(c *gin.Context) {
 	prompt := util.CreatePrompt()
 
 	data := map[string]interface{}{
-		"text": body.Text,
+		"system": "You are a programming expert and you will answer my questions in markdown format",
+		"text":   body.Text,
 	}
 
 	msg, _ := prompt.FormatMessages(data)

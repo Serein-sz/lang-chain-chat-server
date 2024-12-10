@@ -1,19 +1,27 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"fmt"
+	"lang-chain-chat-server/middleware"
 	"lang-chain-chat-server/routes"
-	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	r := gin.New()
+	r := gin.Default()
+
+	r.Use(middleware.CorsMiddleware())
+	
 	routes.RegisterAllRoutes(r)
-	r.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{
-			"data": "Hello World",
-		})
-	})
 
 	r.Run(":8000")
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	fmt.Println("Shutting down server...")
 }
