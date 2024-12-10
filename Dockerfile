@@ -1,6 +1,6 @@
 # 使用官方的 Go 语言镜像作为基础镜像
 # 这里使用 Go 1.23.0 版本的 Alpine Linux 镜像
-FROM golang:1.23.0-alpine AS builder
+FROM golang:1.23.1-alpine AS builder
 
 LABEL authors="wangqiang"
 
