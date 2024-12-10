@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"lang-chain-chat-server/middleware"
 	"lang-chain-chat-server/routes"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -15,13 +15,17 @@ func main() {
 	r := gin.Default()
 
 	r.Use(middleware.CorsMiddleware())
-	
+
 	routes.RegisterAllRoutes(r)
 
-	r.Run(":8000")
+	err := r.Run(":8000")
+	if err != nil {
+		log.Fatal("server start error: {}", err.Error())
+		return
+	}
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	fmt.Println("Shutting down server...")
+	log.Println("server is shutting down...")
 }
