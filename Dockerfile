@@ -22,9 +22,6 @@ RUN go build -o lang-chain-chat-server
 # Alpine 是一个极简的 Linux 发行版，适合部署阶段
 FROM alpine:latest
 
-# 安装 tzdata 包，确保支持时区的配置
-RUN apk add --no-cache tzdata
-
 # 设置工作目录为 /app
 WORKDIR /app
 
