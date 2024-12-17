@@ -1,11 +1,12 @@
 package controller
 
 import (
-	"github.com/tmc/langchaingo/llms"
 	"lang-chain-chat-server/model"
 	"lang-chain-chat-server/service"
 	"lang-chain-chat-server/util"
 	"net/http"
+
+	"github.com/tmc/langchaingo/llms"
 
 	"github.com/gin-gonic/gin"
 )
