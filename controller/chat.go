@@ -23,7 +23,7 @@ func (ch *Chat) DoChat(c *gin.Context) {
 
 	history := service.GenerateHistory(body.Messages)
 
-	messages := make([]llms.MessageContent, len(history)+1)
+	messages := make([]llms.MessageContent, 0)
 
 	prompt, _ := util.CreateSystemPrompt().Format(map[string]interface{}{
 		"system": `
@@ -37,7 +37,14 @@ func (ch *Chat) DoChat(c *gin.Context) {
 		messages = append(messages, llms.TextParts(chatMessage.GetType(), chatMessage.GetContent()))
 		chatMessage.GetType()
 	}
+	llm, err := util.CreateLlm(body.Model)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
 
-	service.HandleSse(c, util.CreateOllama(c, body.Model), messages)
+	service.HandleSse(c, llm, messages)
 
 }
